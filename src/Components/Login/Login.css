@@ -1,0 +1,43 @@
+.container {
+  text-align: center;
+}
+
+.lock {
+  width: 30%;
+  height: 30%;
+  margin: 50px;
+  border-radius: 50%;
+  box-shadow: 0 7px 15px -7px black;
+  max-width: 450px;
+  max-height: 450px;
+}
+
+.login-button {
+  background: rgb(43, 165, 134);
+  padding: 20px 60px 20px;
+  color: white;
+  border-radius: 500px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.5s;
+  font-size: 30px;
+  letter-spacing: 1.5px;
+  outline: none;
+  box-shadow: 0 3px 15px -7px black;
+  margin: 25px;
+}
+
+.login-button:hover {
+  background: #1ED760;
+}
+
+@media screen and (max-width: 767px) {
+	.lock {
+		width: 200px;
+		margin-top: 75px;
+	}
+
+	.login-button {
+		font-size: 18px;
+	}
+}
