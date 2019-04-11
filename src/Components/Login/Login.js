@@ -6,7 +6,7 @@ class Login extends Component {
 
 	render() {
 		const login = () => {
-			window.location.href = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.REACT_APP_CLIENT_ID}&scope=user-library-read&redirect_uri=http://localhost:3000/dashboard`;
+			window.location.href = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.REACT_APP_CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://localhost:3000/dashboard`;
 		}
 
 		return (
