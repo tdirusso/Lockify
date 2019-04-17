@@ -1,17 +1,46 @@
 import React, { Component } from 'react';
 import './Dashboard.css';
-const qs = require('querystring');
+import Spinner from '../Spinner/Spinner';
 
 class Dashboard extends Component {
 
-    getToken(code) {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: true
+        };
+    }
+
+    componentDidMount() {
+        const URL = window.location.href;
+        const token = URL.match(/#(?:access_token)=([\S\s]*?)&/)[1];
         const self = this;
-        fetch(`token?code=${code}`)
-            .then(data => data.ok ? data.json() : Error(data.statusText))
-            .then(response => self.saveUser(response))
-            .then(data => data.json())
-            .then(response => console.log(response))
-            .catch(error => console.log(error));
+
+        if (token) {
+            fetch(`getUser?access_token=${token}`)
+                .then(data => data.ok ? data.json() : Error(data.statusText))
+                .then(response => {
+                    console.log(response);
+                    if (response.redirect === true) {
+                        window.location = response.URL;
+                    } else {
+                        setTimeout(() => {
+                            if (response.length === 0) {
+                                self.setState({
+                                    new_user: true,
+                                    loading: false
+                                })
+                            } else {
+                                self.setState({
+                                    new_user: false,
+                                    loading: false
+                                })
+                            }
+                        }, 3500)
+                    }
+                })
+                .catch(error => console.log(error));
+        }
     }
 
     saveUser(token_json) {
@@ -35,23 +64,24 @@ class Dashboard extends Component {
     getTracks(access_token) {
         fetch(`tracks?token=${access_token}`)
             .then(data => data.ok ? data.json() : Error(data.statusText))
-            .then((response) => {
+            .then(response => {
                 console.log(JSON.parse(response));
             })
             .catch(error => console.log(error));
     }
 
     render() {
-        const query = qs.parse(window.location.search);
-        const code = query['?code'];
-        if (!code) {
+        const URL = window.location.href;
+        const token = URL.match(/#(?:access_token)=([\S\s]*?)&/)[1];
+
+        if (!token) {
             this.props.history.push('/');
             return null;
         } else {
             return (
                 <div className="container">
-                    {this.getToken(code)}
-                    Dashboard
+                    <Spinner isLoading={this.state.loading}/>
+                    {this.state.loading ? (<div className="please-wait">Please wait...</div>) : (<div>Existing</div>)}
                 </div>
             );
         }

@@ -33,33 +33,38 @@ const request = (options) => {
 
 /******************** API Endpoints ********************/
 
-/* Retreives and returns a Spotify access token given a valid access code */
-app.get('/token', (req, res) => {
-    const code = req.query.code;
+app.get('/getUser', (req, res) => {
+    const access_token = req.query.access_token;
 
-    if (!code) {
-        res.status(400).json({ Error: "No access code was provided." });
+    if (!access_token) {
+        return res.status(400).json({ Error: "No access token or refresh token was provided." });
     }
 
     const options = {
-        hostname: 'accounts.spotify.com',
-        path: '/api/token',
-        method: 'POST',
+        hostname: 'api.spotify.com',
+        path: '/v1/me',
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        payload: qs.stringify({
-            grant_type: "authorization_code",
-            code: code,
-            redirect_uri: 'http://localhost:3000/dashboard',
-            client_id: process.env.CLIENT_ID,
-            client_secret: process.env.CLIENT_SECRET
-        })
+            'Authorization': `Bearer ${access_token}`
+        }
     };
 
-    return request(options)
-        .then(data => res.json(data))
-        .catch(error => res.json(error));
+    request(options)
+        .then(user => {
+            user = JSON.parse(user);
+            if (user.error && user.error.message === 'Invalid access token') {
+                return res.json({
+                    redirect: true,
+                    URL: `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://localhost:3000/dashboard&state=123`
+                });
+            }
+            connection.query(`SELECT Songs FROM Users WHERE Username = '${user.id}'`, function (err, result) {
+                if (err) throw err;
+                res.json(result);
+            });
+        })
+        .catch(error => {console.log(error);res.json(error)});
+
 });
 
 app.post('/saveUser', (req, res) => {
@@ -91,7 +96,7 @@ app.post('/saveUser', (req, res) => {
                 });
             });
         })
-        .catch(error => res.json(error))
+        .catch(error => res.json(error));
 });
 
 /* Retreives and returns Spotify tracks for the current user given a valid access token */
@@ -113,5 +118,5 @@ app.get('/tracks', (req, res) => {
 
     return request(options)
         .then(data => res.json(data))
-        .catch(error => res.json(error))
+        .catch(error => res.json(error));
 });

@@ -3,8 +3,8 @@
 }
 
 .lock {
-  width: 30%;
-  height: 30%;
+  width: 25%;
+  height: 25%;
   margin: 50px;
   border-radius: 50%;
   box-shadow: 0 7px 15px -7px black;
@@ -20,7 +20,7 @@
   cursor: pointer;
   border: none;
   transition: background 0.5s;
-  font-size: 30px;
+  font-size: 2em;
   letter-spacing: 1.5px;
   outline: none;
   box-shadow: 0 3px 15px -7px black;
@@ -31,13 +31,36 @@
   background: #1ED760;
 }
 
+.title {
+  color: white;
+  font-size: 4.5em;
+}
+
+.description {
+  color: white;
+  font-size: 2.25em;
+}
+
+.title-container {
+  margin-bottom: 25px;
+}
+
 @media screen and (max-width: 767px) {
 	.lock {
 		width: 200px;
-		margin-top: 75px;
+    margin-top: 75px;
+    margin-bottom: 25px;
 	}
 
 	.login-button {
 		font-size: 18px;
-	}
+  }
+  
+  .title {
+    font-size: 2.5em;
+  }
+
+  .description {
+    font-size: 1.25em;
+  }
 }

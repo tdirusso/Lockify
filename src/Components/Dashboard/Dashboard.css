@@ -1,0 +1,14 @@
+.please-wait {
+    font-size: 2em;
+    letter-spacing: 2px;
+    animation: fadeIn 1.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
