@@ -1,14 +1,17 @@
 const bodyParser = require('body-parser');
 const connection = require('./database');
+const NodeCache = require("node-cache");
 const express = require('express');
-const qs = require('querystring');
 const https = require('https');
 const path = require('path');
+const url = require('url');
 const app = express();
 const port = 8000;
 
-app.use(bodyParser.urlencoded({ extended: false })); 
-app.use(bodyParser.json());
+const Cache = new NodeCache({ stdTTL: 3600 });
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 require('dotenv').config();
 
@@ -40,7 +43,7 @@ app.get('/getUser', (req, res) => {
         return res.status(400).json({ Error: "No access token or refresh token was provided." });
     }
 
-    const options = {
+    let options = {
         hostname: 'api.spotify.com',
         path: '/v1/me',
         method: 'GET',
@@ -52,71 +55,78 @@ app.get('/getUser', (req, res) => {
     request(options)
         .then(user => {
             user = JSON.parse(user);
-            if (user.error && user.error.message === 'Invalid access token') {
+            if (user.error && (user.error.message === 'Invalid access token' || user.error.message === 'The access token expired')) {
                 return res.json({
                     redirect: true,
-                    URL: `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://localhost:3000/dashboard&state=123`
+                    URL: `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://192.168.0.152:3000/dashboard&state=123`
                 });
+            } else {
+                let cached_user = Cache.get(user.id);
+
+                if (cached_user !== undefined) {
+                    res.json(cached_user);
+                } else {
+                    connection.query(`SELECT * FROM Users WHERE Username = '${user.id}'`, (err, result) => {
+                        if (err) throw err;
+                        if (result.length === 0) {
+
+                            function getSongs(URL) {
+                                const nextURL = url.parse(URL);
+
+                                options = {
+                                    hostname: 'api.spotify.com',
+                                    path: nextURL.path,
+                                    method: 'GET',
+                                    headers: {
+                                        'Authorization': `Bearer ${access_token}`,
+                                    }
+                                };
+
+                                return new Promise((resolve, reject) => {
+                                    request(options)
+                                        .then(data => {
+                                            data = JSON.parse(data);
+
+                                            data.items.forEach(song => {
+                                                songs.push({ Name: song.track.name, Artists: song.track.artists, Images: song.track.album.images });
+                                            });
+
+                                            resolve(data.next ? getSongs(data.next) : '');
+                                        })
+                                        .catch(error => reject(error));
+                                });
+                            }
+
+                            let songs = [];
+                            getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
+                                user.songs = songs;
+                                Cache.set(user.id, user);
+                                res.json(user);
+                            }).catch(error => res.json(error));
+                        } else {
+                            user.songs = result[0].Songs;
+                            user.updated = result[0].Updated;
+                            res.json(user);
+                        }
+                    });
+                }
             }
-            connection.query(`SELECT Songs FROM Users WHERE Username = '${user.id}'`, function (err, result) {
-                if (err) throw err;
-                res.json(result);
-            });
         })
-        .catch(error => {console.log(error);res.json(error)});
+        .catch(error => res.json(error));
 
 });
 
-app.post('/saveUser', (req, res) => {
-    const access_token = req.body.access_token;
-    const refresh_token = req.body.refresh_token;
+app.post('/storeSongs', (req, res) => {
+    const user = req.body.user;
 
-    if (!access_token || !refresh_token) {
-        return res.status(400).json({ Error: "No access token or refresh token was provided." });
+    if (!user) {
+        return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    const options = {
-        hostname: 'api.spotify.com',
-        path: '/v1/me',
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${access_token}`,
-        }
-    };
+    const song_string = JSON.stringify(user.songs);
 
-    request(options)
-        .then(user => {
-            user = JSON.parse(user);
-            connection.connect((err) => {
-                if (err) throw err;
-                connection.query(`INSERT INTO Users (Username, AccessToken, RefreshToken) VALUES ("${user.display_name}", "${access_token}", "${refresh_token}") ON DUPLICATE KEY UPDATE AccessToken = "${access_token}" AND RefreshToken = "${refresh_token}";`, function (err, result) {
-                    if (err) throw err;
-                    console.log(result);
-                    res.json(result);
-                });
-            });
-        })
-        .catch(error => res.json(error));
-});
-
-/* Retreives and returns Spotify tracks for the current user given a valid access token */
-app.get('/tracks', (req, res) => {
-    const token = req.query.token;
-
-    if (!token) {
-        return res.status(400).json({ Error: "No access token was provided." });
-    }
-
-    const options = {
-        hostname: 'api.spotify.com',
-        path: '/v1/me/tracks',
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        }
-    };
-
-    return request(options)
-        .then(data => res.json(data))
-        .catch(error => res.json(error));
+    connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES ("${user.display_name}", ${JSON.stringify(song_string)}, NOW()) ON DUPLICATE KEY UPDATE Songs = ${JSON.stringify(song_string)}, Updated = NOW();`, (err, result) => {
+        if (err) throw err;
+        res.json(result);
+    });
 });

@@ -20,54 +20,40 @@ class Dashboard extends Component {
             fetch(`getUser?access_token=${token}`)
                 .then(data => data.ok ? data.json() : Error(data.statusText))
                 .then(response => {
-                    console.log(response);
                     if (response.redirect === true) {
                         window.location = response.URL;
                     } else {
-                        setTimeout(() => {
-                            if (response.length === 0) {
-                                self.setState({
-                                    new_user: true,
-                                    loading: false
-                                })
-                            } else {
-                                self.setState({
-                                    new_user: false,
-                                    loading: false
-                                })
-                            }
-                        }, 3500)
+                        console.log(response);
+                        if (response.updated === undefined) {
+                            self.setState({
+                                user: response,
+                                new_user: true,
+                                loading: false
+                            });
+                        } else {
+                            self.setState({
+                                user: response,
+                                new_user: false,
+                                loading: false
+                            });
+                        }
                     }
                 })
                 .catch(error => console.log(error));
         }
     }
 
-    saveUser(token_json) {
-        token_json = JSON.parse(token_json);
-        if (token_json.error) {
-            throw new Error(token_json.error);
-        } else {
-            const access_token = token_json.access_token;
-            const refresh_token = token_json.refresh_token;
-
-            return fetch('saveUser', {
-                method: 'POST',
-                body: JSON.stringify({ access_token, refresh_token }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-        }
-    }
-
-    getTracks(access_token) {
-        fetch(`tracks?token=${access_token}`)
-            .then(data => data.ok ? data.json() : Error(data.statusText))
-            .then(response => {
-                console.log(JSON.parse(response));
-            })
-            .catch(error => console.log(error));
+    storeSongs() {
+        const self = this;
+        fetch('storeSongs', {
+            method: 'POST',
+            body: JSON.stringify({ user: self.state.user }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => console.log(response))
+        .catch(error => console.log(error));
     }
 
     render() {
@@ -78,12 +64,31 @@ class Dashboard extends Component {
             this.props.history.push('/');
             return null;
         } else {
-            return (
-                <div className="container">
-                    <Spinner isLoading={this.state.loading}/>
-                    {this.state.loading ? (<div className="please-wait">Please wait...</div>) : (<div>Existing</div>)}
-                </div>
-            );
+            if (this.state.loading) {
+                return (
+                    <div className="container">
+                        <Spinner />
+                        <div className="please-wait animated bounceInUp">Please wait...</div>
+                    </div>
+                );
+            } else {
+                if (this.state.new_user) {
+                    return (
+                        <div className="container new-center">
+                            <div className="hello animated fadeInDown">Hello {this.state.user.display_name}!</div>
+                            <div className="no-back-up animated bounceInLeft">It looks like we don't yet have your songs backed up.</div>
+                            <div className="get-started animated bounceInLeft">Click the button below to get started!</div>
+                            <button onClick={() => this.storeSongs()} className="backup-button animated bounceInRight">Store My Music</button>
+                        </div>
+                    );
+                } else {
+                    return (
+                        <div className="container">
+                            <div>Dashboard</div>
+                        </div>
+                    );
+                }
+            }
         }
     }
 }

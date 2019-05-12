@@ -1,8 +1,9 @@
-body {
+html, body {
 	margin: 0;
 	padding: 0;
 	height: 100vh;
 	background-image: linear-gradient(to bottom, #000000, #14238c);
 	font-family: 'Source Sans Pro', serif;
 	color: white;
+	overflow-x: hidden
 }

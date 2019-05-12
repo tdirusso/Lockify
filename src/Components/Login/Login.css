@@ -8,8 +8,8 @@
   margin: 50px;
   border-radius: 50%;
   box-shadow: 0 7px 15px -7px black;
-  max-width: 450px;
-  max-height: 450px;
+  max-width: 300px;
+  max-height: 300px;
 }
 
 .login-button {

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import './Spinner.css';
+import SpinnerSVG from '../../Assets/loading.svg';
 
 class Spinner extends Component {
 
     render() {
         return (
-            this.props.isLoading ? (<div className="spinner"></div>) : (null)
+            <img src={SpinnerSVG} className="spinner" alt="Lockify"></img>
         );
     }
 }
