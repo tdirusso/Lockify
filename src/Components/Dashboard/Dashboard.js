@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './Dashboard.css';
 import Spinner from '../Spinner/Spinner';
+import Sync from '../../Assets/sync.svg';
 
 class Dashboard extends Component {
 
@@ -23,7 +24,6 @@ class Dashboard extends Component {
                     if (response.redirect === true) {
                         window.location = response.URL;
                     } else {
-                        console.log(response);
                         if (response.updated === undefined) {
                             self.setState({
                                 user: response,
@@ -31,11 +31,13 @@ class Dashboard extends Component {
                                 loading: false
                             });
                         } else {
-                            self.setState({
-                                user: response,
-                                new_user: false,
-                                loading: false
-                            });
+                            setTimeout(() => {
+                                self.setState({
+                                    user: response,
+                                    new_user: false,
+                                    loading: false
+                                });
+                            }, 1500);
                         }
                     }
                 })
@@ -44,6 +46,7 @@ class Dashboard extends Component {
     }
 
     storeSongs() {
+        this.setState({ loading: true });
         const self = this;
         fetch('storeSongs', {
             method: 'POST',
@@ -52,8 +55,22 @@ class Dashboard extends Component {
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => console.log(response))
-        .catch(error => console.log(error));
+            .then((response) => {
+                console.log(response)
+                setTimeout(() => {
+                    self.setState({
+                        loading: false,
+                        new_user: undefined,
+                        new_user_saved: true
+                    });
+                    console.log(self.state);
+                }, 1000);
+            })
+            .catch(error => console.log(error));
+    }
+
+    parseDate(date) {
+        return new Date(date).toDateString();
     }
 
     render() {
@@ -81,10 +98,64 @@ class Dashboard extends Component {
                             <button onClick={() => this.storeSongs()} className="backup-button animated bounceInRight">Store My Music</button>
                         </div>
                     );
+                } else if (this.state.new_user_saved) {
+                    return (
+                        <div className="container new-center">
+                            <div className="thank-you animated bounceInLeft">
+                                Thank you for backing your songs up with Lockify!
+                            <br /><br />
+                                Click the button below to access the dashboard.
+                            </div>
+                            <br />
+                            <button onClick={() => window.location.reload()} className="backup-button small-delay animated bounceInRight">Dashboard</button>
+                        </div>
+                    );
                 } else {
                     return (
                         <div className="container">
-                            <div>Dashboard</div>
+                            <div className="header">
+                                <button onClick={() => window.location.reload()} className="backup-button header-left">Backup</button>
+                                <img src={Sync} className="sync" />
+                                <button onClick={() => window.location.reload()} className="delete-button header-right">Delete</button>
+                            </div>
+
+                            <div class="deleted-container">
+                                <div className="dashboard-title">Deleted since &mdash; <div className="primary">{this.parseDate(this.state.user.updated)}</div></div>
+                                <div className="card-container first">
+                                    <div className="card">
+                                        <div className="card-image">
+                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
+                                        </div>
+                                        <div className="card-song-title">
+                                            Far Away
+                                            </div>
+                                        <div className="card-song-artist">
+                                            Nickelback
+                                            </div>
+                                    </div>
+                                </div>
+                                <div className="card-container">
+                                    <div className="card">
+                                        <div className="card-image">
+                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-container">
+                                    <div className="card">
+                                        <div className="card-image">
+                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="card-container">
+                                    <div className="card">
+                                        <div className="card-image">
+                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     );
                 }

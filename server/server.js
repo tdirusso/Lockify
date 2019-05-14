@@ -123,6 +123,7 @@ app.post('/storeSongs', (req, res) => {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
+    Cache.del(user.display_name);
     const song_string = JSON.stringify(user.songs);
 
     connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES ("${user.display_name}", ${JSON.stringify(song_string)}, NOW()) ON DUPLICATE KEY UPDATE Songs = ${JSON.stringify(song_string)}, Updated = NOW();`, (err, result) => {
