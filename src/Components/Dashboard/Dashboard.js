@@ -8,7 +8,8 @@ class Dashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            loading: true
+            loading: true,
+            deleted_songs: []
         };
     }
 
@@ -21,6 +22,7 @@ class Dashboard extends Component {
             fetch(`getUser?access_token=${token}`)
                 .then(data => data.ok ? data.json() : Error(data.statusText))
                 .then(response => {
+                    console.log(response);
                     if (response.redirect === true) {
                         window.location = response.URL;
                     } else {
@@ -31,13 +33,11 @@ class Dashboard extends Component {
                                 loading: false
                             });
                         } else {
-                            setTimeout(() => {
-                                self.setState({
-                                    user: response,
-                                    new_user: false,
-                                    loading: false
-                                });
-                            }, 1500);
+                            self.setState({
+                                user: response,
+                                new_user: false,
+                            });
+                            self.getDeletedSongs();
                         }
                     }
                 })
@@ -45,32 +45,87 @@ class Dashboard extends Component {
         }
     }
 
+
     storeSongs() {
         this.setState({ loading: true });
         const self = this;
+
         fetch('storeSongs', {
             method: 'POST',
             body: JSON.stringify({ user: self.state.user }),
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
-            .then((response) => {
-                console.log(response)
-                setTimeout(() => {
-                    self.setState({
-                        loading: false,
-                        new_user: undefined,
-                        new_user_saved: true
-                    });
-                    console.log(self.state);
-                }, 1000);
-            })
-            .catch(error => console.log(error));
+        }).then(() => {
+            setTimeout(() => {
+                self.setState({
+                    loading: false,
+                    new_user: undefined,
+                    new_user_saved: true
+                });
+            }, 1000);
+        }).catch(error => console.log(error));
+
+    }
+
+    updateSongs() {
+        const confirmed = window.confirm('You are about to override your backed up songs with your current Spotify songs list.  Would you like to continue?');
+        if (confirmed) {
+            this.storeSongs();
+        }
     }
 
     parseDate(date) {
         return new Date(date).toDateString();
+    }
+
+    getDeletedSongs() {
+        const URL = window.location.href;
+        const token = URL.match(/#(?:access_token)=([\S\s]*?)&/)[1];
+        const self = this;
+
+        fetch('deletedSongs', {
+            method: 'POST',
+            body: JSON.stringify({
+                user: self.state.user,
+                access_token: token
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(data => data.ok ? data.json() : Error(data.statusText))
+            .then((response) => {
+                const deleted_songs = JSON.parse(response);
+                self.setState({
+                    loading: false,
+                    deleted_songs: deleted_songs
+                });
+            }).catch(error => console.log(error));
+    }
+
+    sync() {
+        document.querySelector('.sync').className += ' spin ';
+        setTimeout(() => {
+            this.setState({ loading: true });
+            this.getDeletedSongs();
+        }, 1250);
+    }
+
+    deleteAccount() {
+        const self = this;
+        const confirmed = window.confirm('Are you sure you want to delete your Lockify account?  All of your data will be permanently lost.');
+
+        if (confirmed) {
+            fetch('deleteAccount', {
+                method: 'POST',
+                body: JSON.stringify({ user: self.state.user }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(() => {
+                window.location = window.location.origin + '/';
+            }).catch(error => console.log(error));
+        }
     }
 
     render() {
@@ -114,47 +169,32 @@ class Dashboard extends Component {
                     return (
                         <div className="container">
                             <div className="header">
-                                <button onClick={() => window.location.reload()} className="backup-button header-left">Backup</button>
-                                <img src={Sync} className="sync" />
-                                <button onClick={() => window.location.reload()} className="delete-button header-right">Delete</button>
+                                <button onClick={() => this.updateSongs()} className="backup-button header-left animate bounceInDown">Backup</button>
+                                <img onClick={() => this.sync()} src={Sync} className="sync animate bounceInDown" alt="Sync" />
+                                <button onClick={() => this.deleteAccount()} className="delete-button header-right animate bounceInDown">Delete</button>
                             </div>
 
-                            <div class="deleted-container">
-                                <div className="dashboard-title">Deleted since &mdash; <div className="primary">{this.parseDate(this.state.user.updated)}</div></div>
-                                <div className="card-container first">
-                                    <div className="card">
-                                        <div className="card-image">
-                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
-                                        </div>
-                                        <div className="card-song-title">
-                                            Far Away
+                            <div className="deleted-container">
+                                <div className="dashboard-title animate slideInLeft">Deleted since &mdash; <div className="primary">{this.parseDate(this.state.user.updated)}</div></div>
+                                {
+                                    this.state.deleted_songs.length === 0 ? <div className="no-songs-removed animated slideInRight">No songs have been removed since your last backup.</div> : this.state.deleted_songs.map((song, index) => {
+                                        return (
+                                            <div key={index} className="card-container animate bounceInUp">
+                                                <div className="card" onClick={() => window.open(song.URL, '_blank')}>
+                                                    <div className="card-image">
+                                                        <img src={song.Images[0].url} alt="Album" />
+                                                    </div>
+                                                    <div className="card-song-title">
+                                                        {song.Name}
+                                                    </div>
+                                                    <div className="card-song-artist">
+                                                        {song.Artists[0].name}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        <div className="card-song-artist">
-                                            Nickelback
-                                            </div>
-                                    </div>
-                                </div>
-                                <div className="card-container">
-                                    <div className="card">
-                                        <div className="card-image">
-                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="card-container">
-                                    <div className="card">
-                                        <div className="card-image">
-                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="card-container">
-                                    <div className="card">
-                                        <div className="card-image">
-                                            <img src="https://img.discogs.com/rm50OyzB4jLcbftN-IEM99VFF8w=/fit-in/600x600/filters:strip_icc():format(jpeg):mode_rgb():quality(90)/discogs-images/R-1445651-1308162454.jpeg.jpg" />
-                                        </div>
-                                    </div>
-                                </div>
+                                        )
+                                    })
+                                }
                             </div>
                         </div>
                     );
