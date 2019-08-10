@@ -13,11 +13,11 @@ app.use(bodyParser.json({ limit: '50mb' }));
 require('dotenv').config();
 
 app.use(express.static(path.join(__dirname, 'build')));
-app.use(express.json());
+app.use(express.json()); 
 
 app.listen(port);
 
-const request = (options) => {
+const request = (options) => { 
     return new Promise((resolve, reject) => {
         const req = https.request(options, (response) => {
             let data = '';

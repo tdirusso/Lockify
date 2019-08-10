@@ -138,6 +138,7 @@ ul li {
     text-align: center;
     display: block;
     clear: both;
+    padding-bottom: 200px;
 }
 
 .card {
@@ -150,13 +151,14 @@ ul li {
     transition: all .15s ease-in-out;
 }
 
-.card-image  {
+.card-image {
     width: 250px;
     height: 250px;
 }
 
 .card-container {
     display: inline-block;
+    vertical-align: bottom;
     animation-duration: 1s;
     animation-iteration-count: 1;
     animation-delay: 2s;
@@ -184,9 +186,7 @@ ul li {
     font-style: italic;
 }
 
-.sync,
-.backup-button.header-left,
-.delete-button.header-right {
+.sync, .backup-button.header-left, .delete-button.header-right {
     animation-duration: 1s;
     animation-iteration-count: 1;
     animation-delay: 0.5s;
@@ -202,7 +202,7 @@ ul li {
 }
 
 .spin {
-    animation: loading 350ms linear 2;
+    animation: loading 350ms linear 1;
 }
 
 .card:hover {
@@ -210,15 +210,29 @@ ul li {
     cursor: pointer;
 }
 
- @keyframes loading {
-    0% { 
-        transform: rotate(0); 
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4d4d4d;
+    border-radius: 20px;
+    min-height: 100px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(to bottom, #000000, #14238c);
+    border-radius: 0px;
+}
+
+@keyframes loading {
+    0% {
+        transform: rotate(0);
     }
-    100% { 
+    100% {
         transform: rotate(360deg);
     }
 }
-
 
 @media screen and (max-width: 767px) {
     .new-center {
@@ -226,26 +240,56 @@ ul li {
         padding-left: 40px;
         padding-right: 40px;
     }
-
-    .no-back-up,
-    .get-started {
+    .no-back-up, .get-started {
         font-size: 1.15rem;
         margin-bottom: 30px;
     }
-
     .please-wait {
         font-size: 1.75rem;
     }
-
     .hello {
         font-size: 2.75rem;
     }
-
     .backup-button {
         font-size: 18px;
     }
-
     .thank-you {
         font-size: 1.5rem;
+    }
+    .backup-button.header-left {
+        margin-bottom: 0px;
+        padding: 10px 25px 10px;
+        font-size: 15px;
+    }
+    .sync {
+        float: right;
+        margin-right: 25px;
+    }
+    .delete-button.header-right {
+        float: left;
+        margin-top: 5px;
+        padding: 10px 30px 10px;
+        clear: both;
+        font-size: 15px;
+    }
+    .dashboard-title {
+        font-size: 25px;
+    }
+    .card:hover {
+        transform: none;
+    }
+    .card {
+        zoom: 0.4;
+        overflow-y: scroll;
+    }
+    .card-song-artist, .card-song-title {
+        font-size: 35px;
+    }
+    .no-songs-removed {
+        font-size: 25px;
+        padding: 25px;
+    }
+    * {
+        -webkit-overflow-scrolling: touch;
     }
 }
