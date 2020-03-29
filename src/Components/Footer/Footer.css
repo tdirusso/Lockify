@@ -1,0 +1,33 @@
+footer {
+	position: absolute;
+	bottom: 0;
+	background-color: white;
+	height: 100px;
+	width: 100%;
+    border-top: 1px solid black;
+    overflow: hidden;
+}
+
+.media-list {
+	position: relative;
+	margin: 0;
+	line-height: 100px;
+    background: white;
+    text-align: center;
+}
+
+.media-list li {
+	margin: 0 40px;
+	font-size: 1.25em;
+	font-weight: 300;
+}
+
+.media-list a {
+	text-decoration: none;
+	color: black;
+}
+
+.media-list a:hover {
+	text-decoration: underline;
+	color: #6561ed;
+}

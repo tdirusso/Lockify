@@ -57,7 +57,7 @@ app.get('/getUser', (req, res) => {
             if (user.error && (user.error.message === 'Invalid access token' || user.error.message === 'The access token expired')) {
                 return res.json({
                     redirect: true,
-                    URL: `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://192.168.0.152:3000/dashboard&state=123`
+                    URL: `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://localhost:3000/dashboard&state=123`
                 });
             } else {
 

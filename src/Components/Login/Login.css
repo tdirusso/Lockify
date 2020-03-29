@@ -1,66 +1,59 @@
 .container {
-  text-align: center;
+	text-align: center;
+	margin-top: 20vh;
 }
 
-.lock {
-  width: 25%;
-  height: 25%;
-  margin: 50px;
-  border-radius: 50%;
-  box-shadow: 0 7px 15px -7px black;
-  max-width: 300px;
-  max-height: 300px;
+.welcome-container {
+	animation-duration: 750ms;
 }
 
 .login-button {
-  background: rgb(43, 165, 134);
-  padding: 20px 60px 20px;
-  color: white;
-  border-radius: 500px;
-  cursor: pointer;
-  border: none;
-  transition: background 0.5s;
-  font-size: 2em;
-  letter-spacing: 1.5px;
-  outline: none;
-  box-shadow: 0 3px 15px -7px black;
-  margin: 25px;
+	background: white;
+	padding: 20px 40px 20px;
+	color: black;
+	border-radius: 20px;
+	cursor: pointer;
+	border: 1px solid;
+	transition: background 200ms, color 200ms, border 200ms;
+	font-size: 2em;
+	letter-spacing: 1.5px;
+	outline: none;
+	box-shadow: 0 3px 15px -7px black;
+	margin: 25px;
+	font-weight: 200;
 }
 
 .login-button:hover {
-  background: #1ED760;
+	background: #3eb1e1;
+	color: white;
+	border: 1px solid transparent;
 }
 
 .title {
-  color: white;
-  font-size: 4.5em;
+	color: white;
+	font-size: 4.5em;
+	font-weight: 200;
+	margin-bottom: 25px;
 }
 
 .description {
-  color: white;
-  font-size: 2.25em;
+	color: white;
+	font-size: 2.25em;
+	font-weight: 200;
 }
 
 .title-container {
-  margin-bottom: 25px;
+	margin-bottom: 25px;
 }
 
 @media screen and (max-width: 767px) {
-	.lock {
-		width: 200px;
-    margin-top: 75px;
-    margin-bottom: 25px;
-	}
-
 	.login-button {
 		font-size: 18px;
-  }
-  
-  .title {
-    font-size: 2.5em;
-  }
-
-  .description {
-    font-size: 1.25em;
-  }
+	}
+	.title {
+		font-size: 2.5em;
+	}
+	.description {
+		font-size: 1.25em;
+	}
 }

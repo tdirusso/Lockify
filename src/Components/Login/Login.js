@@ -1,23 +1,29 @@
 import React, { Component } from 'react';
 import './Login.css';
-import lock from '../../Assets/lock.svg';
+
+const protocol = 'https';
+const domain = 'accounts.spotify.com/authorize';
+const response_type = 'token';
+const client_id = process.env.REACT_APP_CLIENT_ID;
+const scope = encodeURIComponent('user-library-read user-read-email');
+const redirect_uri = 'http://localhost:3000/dashboard';
+
+const authorizeURL = `${protocol}://${domain}?response_type=${response_type}&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=123`;
 
 class Login extends Component {
 
 	render() {
-		const login = () => {
-			window.location.href = `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.REACT_APP_CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://192.168.0.152:3000/dashboard&state=123`;
-		}
+		const login = () => window.location.href = authorizeURL;
 
 		return (
 			<div className="container">
-				<img src={lock} className="lock" alt="Lockify"></img>
-				<br />
-				<div className="title-container">
-					<div className="title">Lockify</div>
-					<div className="description">The Spotify Backup Service</div>
+				<div className="animated fadeInDown welcome-container">
+					<div className="title-container">
+						<div className="title">Lockify</div>
+						<div className="description">Backup your Spotify playist for free access to recently deleted songs.</div>
+					</div>
+					<button onClick={login} className="login-button">Login With Spotify</button>
 				</div>
-				<button onClick={login} className="login-button">Login With Spotify</button>
 			</div>
 		);
 	}
