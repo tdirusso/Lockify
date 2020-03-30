@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import './Spinner.css';
-import SpinnerSVG from '../../Assets/loading.svg';
+import ReactLoading from 'react-loading';
 
 class Spinner extends Component {
 
     render() {
         return (
-            <img src={SpinnerSVG} className="spinner" alt="Lockify"></img>
+            <div className="spinner-container">
+                <ReactLoading type="spinningBubbles" color="white" width={250} height={250} className="spinner"/>
+            </div>
         );
     }
 }

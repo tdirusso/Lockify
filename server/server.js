@@ -13,11 +13,19 @@ app.use(bodyParser.json({ limit: '50mb' }));
 require('dotenv').config();
 
 app.use(express.static(path.join(__dirname, 'build')));
-app.use(express.json()); 
+app.use(express.json());
 
 app.listen(port);
 
-const request = (options) => { 
+const auth_protocol = 'https';
+const auth_domain = 'accounts.spotify.com/authorize';
+const auth_response_type = 'token';
+const auth_client_id = process.env.REACT_APP_CLIENT_ID;
+const auth_scope = encodeURIComponent('user-library-read user-read-email');
+const auth_redirect_uri = 'http://localhost:3000/dashboard';
+const authorize_url = `${auth_protocol}://${auth_domain}?response_type=${auth_response_type}&client_id=${auth_client_id}&scope=${auth_scope}&redirect_uri=${auth_redirect_uri}&state=123`;
+
+const request = (options) => {
     return new Promise((resolve, reject) => {
         const req = https.request(options, (response) => {
             let data = '';
@@ -57,13 +65,18 @@ app.get('/getUser', (req, res) => {
             if (user.error && (user.error.message === 'Invalid access token' || user.error.message === 'The access token expired')) {
                 return res.json({
                     redirect: true,
-                    URL: `https://accounts.spotify.com/authorize?response_type=token&client_id=${process.env.CLIENT_ID}&scope=user-library-read%20user-read-email&redirect_uri=http://localhost:3000/dashboard&state=123`
+                    URL: authorize_url
                 });
             } else {
-
                 connection.query(`SELECT * FROM Users WHERE Username = '${user.id}'`, (err, result) => {
                     if (err) throw err;
                     if (result.length === 0) {
+                        let songs = [];
+
+                        getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
+                            user.songs = songs;
+                            res.json(user);
+                        }).catch(error => res.json(error));
 
                         function getSongs(URL) {
                             const nextURL = url.parse(URL);
@@ -83,7 +96,7 @@ app.get('/getUser', (req, res) => {
                                         data = JSON.parse(data);
 
                                         data.items.forEach(song => {
-                                            songs.push({ Name: song.track.name, Artists: song.track.artists, Images: song.track.album.images, URL: song.track.external_urls.spotify });
+                                            songs.push({ Name: song.track.name, Artist: song.track.artists[0], Image: song.track.album.images[0], URL: song.track.external_urls.spotify });
                                         });
 
                                         resolve(data.next ? getSongs(data.next) : '');
@@ -91,12 +104,6 @@ app.get('/getUser', (req, res) => {
                                     .catch(error => reject(error));
                             });
                         }
-
-                        let songs = [];
-                        getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
-                            user.songs = songs;
-                            res.json(user);
-                        }).catch(error => res.json(error));
                     } else {
                         user.songs = JSON.parse(result[0].Songs);
                         user.updated = result[0].Updated;
@@ -107,7 +114,6 @@ app.get('/getUser', (req, res) => {
             }
         })
         .catch(error => res.json(error));
-
 });
 
 
@@ -122,7 +128,7 @@ app.post('/storeSongs', (req, res) => {
 
     connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES ("${user.display_name}", ${song_string}, NOW()) ON DUPLICATE KEY UPDATE Songs = ${song_string}, Updated = NOW();`, (err, result) => {
         if (err) throw err;
-        res.json(result);
+        res.end();
     });
 });
 

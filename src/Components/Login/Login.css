@@ -1,59 +1,25 @@
-.container {
-	text-align: center;
-	margin-top: 20vh;
+.title-container {
+	margin-bottom: 50px;
 }
 
-.welcome-container {
-	animation-duration: 750ms;
+.login.title {
+	animation-delay: 0ms;
+}
+
+.login.description {
+	animation-delay: 150ms;
 }
 
 .login-button {
-	background: white;
-	padding: 20px 40px 20px;
-	color: black;
-	border-radius: 20px;
-	cursor: pointer;
-	border: 1px solid;
-	transition: background 200ms, color 200ms, border 200ms;
-	font-size: 2em;
-	letter-spacing: 1.5px;
-	outline: none;
-	box-shadow: 0 3px 15px -7px black;
-	margin: 25px;
-	font-weight: 200;
+	animation-delay: 300ms;
 }
 
-.login-button:hover {
-	background: #3eb1e1;
-	color: white;
-	border: 1px solid transparent;
-}
-
-.title {
-	color: white;
-	font-size: 4.5em;
-	font-weight: 200;
-	margin-bottom: 25px;
-}
-
-.description {
-	color: white;
-	font-size: 2.25em;
-	font-weight: 200;
-}
-
-.title-container {
-	margin-bottom: 25px;
+.login.description, .login.title, .login-button {
+	animation-duration: 750ms;
 }
 
 @media screen and (max-width: 767px) {
 	.login-button {
 		font-size: 18px;
-	}
-	.title {
-		font-size: 2.5em;
-	}
-	.description {
-		font-size: 1.25em;
 	}
 }

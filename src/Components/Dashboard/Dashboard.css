@@ -1,91 +1,9 @@
-.please-wait {
-    font-size: 2em;
-    letter-spacing: 4px;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-}
-
-.backup-button {
-    background: rgb(43, 165, 134);
-    padding: 20px 60px 20px;
-    color: white;
-    border-radius: 500px;
-    cursor: pointer;
-    border: none;
-    transition: background 0.5s;
-    font-size: 2em;
-    letter-spacing: 1.5px;
-    outline: none;
-    box-shadow: 0 3px 15px -7px black;
-    margin: 25px;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 1.35s;
-}
-
-.backup-button.small-delay {
-    animation-delay: 0.5s;
-}
-
-.backup-button:hover {
-    background: #1ED760;
-}
-
-.sync {
-    float: left;
-    margin-top: 25px;
-    cursor: pointer;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 1.35s;
-}
-
-.sync:hover {
-    opacity: 0.75;
-}
-
-.new-center {
-    padding-top: 20vh;
-    overflow-wrap: break-word;
-}
-
-.hello {
-    font-size: 4.5rem;
-    margin-bottom: 45px;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-}
-
-.no-back-up {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 1.35s;
-}
-
-.get-started {
-    font-size: 1.5rem;
-    margin-bottom: 45px;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 1.35s;
-}
-
-.thank-you {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 0.5s;
-}
-
 .dashboard-title {
     font-size: 2em;
     letter-spacing: 1.5px;
     margin: 25px;
     margin-bottom: 50px;
-    animation-duration: 1s;
+    animation-duration: 750ms;
     animation-iteration-count: 1;
     animation-delay: 1.5s;
     animation-fill-mode: both;
@@ -94,36 +12,6 @@
 .primary {
     display: inline;
     color: rgb(43, 165, 134);
-}
-
-.header {
-    overflow: hidden;
-}
-
-.backup-button.header-left {
-    float: left;
-    font-size: 1em;
-    padding: 15px 40px 15px;
-}
-
-.delete-button.header-right {
-    float: right;
-    background: #ff6961;
-    padding: 15px 40px 15px;
-    color: white;
-    border-radius: 500px;
-    cursor: pointer;
-    border: none;
-    transition: background 0.5s;
-    font-size: 1em;
-    letter-spacing: 1.5px;
-    outline: none;
-    box-shadow: 0 3px 15px -7px black;
-    margin: 25px;
-}
-
-.delete-button:hover {
-    background: #c31d14;
 }
 
 ul {
@@ -159,7 +47,7 @@ ul li {
 .card-container {
     display: inline-block;
     vertical-align: bottom;
-    animation-duration: 1s;
+    animation-duration: 750ms;
     animation-iteration-count: 1;
     animation-delay: 2s;
     animation-fill-mode: both;
@@ -186,16 +74,9 @@ ul li {
     font-style: italic;
 }
 
-.sync, .backup-button.header-left, .delete-button.header-right {
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 0.5s;
-    animation-fill-mode: both;
-}
-
 .no-songs-removed {
     font-size: 1.5rem;
-    animation-duration: 1s;
+    animation-duration: 750ms;
     animation-iteration-count: 1;
     animation-delay: 1.5s;
     animation-fill-mode: both;
@@ -235,43 +116,6 @@ ul li {
 }
 
 @media screen and (max-width: 767px) {
-    .new-center {
-        padding-top: 10vh;
-        padding-left: 40px;
-        padding-right: 40px;
-    }
-    .no-back-up, .get-started {
-        font-size: 1.15rem;
-        margin-bottom: 30px;
-    }
-    .please-wait {
-        font-size: 1.75rem;
-    }
-    .hello {
-        font-size: 2.75rem;
-    }
-    .backup-button {
-        font-size: 18px;
-    }
-    .thank-you {
-        font-size: 1.5rem;
-    }
-    .backup-button.header-left {
-        margin-bottom: 0px;
-        padding: 10px 25px 10px;
-        font-size: 15px;
-    }
-    .sync {
-        float: right;
-        margin-right: 25px;
-    }
-    .delete-button.header-right {
-        float: left;
-        margin-top: 5px;
-        padding: 10px 30px 10px;
-        clear: both;
-        font-size: 15px;
-    }
     .dashboard-title {
         font-size: 25px;
     }

@@ -1,16 +1,7 @@
-.spinner {
-    display: inline-block;
-    width: 20rem;
-    height: 20rem;
-    margin-top: 250px;
-    margin-bottom: 50px;
+.spinner-container {
+    margin-top: 20vh;
 }
 
-@media screen and (max-width: 767px) {
-    .spinner {
-        margin-top: 125px;
-        margin-bottom: 30px;
-        width: 15rem;
-        height: 15rem;
-    }
+.spinner {
+    margin: 0 auto;
 }

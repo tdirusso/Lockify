@@ -1,0 +1,30 @@
+.description.margin {
+    margin-bottom: 15px;
+}
+
+.thank-you {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.saved-user.title {
+    animation-delay: 0ms;
+}
+
+.saved-user.description {
+    animation-delay: 150ms;
+}
+
+.dashboard-button {
+    animation-delay: 300ms;
+}
+
+.saved-user.description, .saved-user.title, .dashboard-button {
+    animation-duration: 750ms;
+}
+
+@media screen and (max-width: 767px) {
+    .thank-you {
+        font-size: 1.5rem;
+    }
+}

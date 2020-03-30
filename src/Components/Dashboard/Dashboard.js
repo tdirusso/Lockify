@@ -1,7 +1,9 @@
+import SavedUser from '../SavedUser/SavedUser';
 import React, { Component } from 'react';
-import './Dashboard.css';
 import Spinner from '../Spinner/Spinner';
-import Sync from '../../Assets/sync.svg';
+import NewUser from '../NewUser/NewUser';
+import Header from '../Header/Header';
+import './Dashboard.css';
 
 class Dashboard extends Component {
 
@@ -14,34 +16,45 @@ class Dashboard extends Component {
     }
 
     componentDidMount() {
-        const URL = window.location.href;
-        const token = URL.match(/#(?:access_token)=([\S\s]*?)&/);
+        this.getUser();
+        this.deleteAccount = this.deleteAccount.bind(this);
+        this.updateSongs = this.updateSongs.bind(this);
+        this.storeSongs = this.storeSongs.bind(this);
+        this.sync = this.sync.bind(this);
+    }
+
+    getToken() {
+        const currentURL = window.location.href;
+        const token = currentURL.match(/#(?:access_token)=([\S\s]*?)&/);
+        return token[1];
+    }
+
+    getUser() {
+        const token = this.getToken();
         const self = this;
 
-        if (token) {
-            fetch(`getUser?access_token=${token[1]}`)
-                .then(data => data.ok ? data.json() : Error(data.statusText))
-                .then(response => {
-                    if (response.redirect === true) {
-                        window.location = response.URL;
+        fetch(`getUser?access_token=${token}`)
+            .then(data => data.ok ? data.json() : Error(data.statusText))
+            .then(response => {
+                if (response.redirect === true) {
+                    window.location = response.URL;
+                } else {
+                    if (response.updated === undefined) {
+                        self.setState({
+                            user: response,
+                            new_user: true,
+                            loading: false
+                        });
                     } else {
-                        if (response.updated === undefined) {
-                            self.setState({
-                                user: response,
-                                new_user: true,
-                                loading: false
-                            });
-                        } else {
-                            self.setState({
-                                user: response,
-                                new_user: false,
-                            });
-                            self.getDeletedSongs();
-                        }
+                        self.setState({
+                            user: response,
+                            new_user: false,
+                        });
+                        self.getDeletedSongs();
                     }
-                })
-                .catch(error => console.log(error));
-        }
+                }
+            })
+            .catch(error => console.log(error));
     }
 
 
@@ -56,19 +69,17 @@ class Dashboard extends Component {
                 'Content-Type': 'application/json'
             }
         }).then(() => {
-            setTimeout(() => {
-                self.setState({
-                    loading: false,
-                    new_user: undefined,
-                    new_user_saved: true
-                });
-            }, 1000);
+            self.setState({
+                loading: false,
+                new_user: undefined,
+                new_user_saved: true
+            });
         }).catch(error => console.log(error));
 
     }
 
     updateSongs() {
-        const confirmed = window.confirm('You are about to override your backed up songs with your current Spotify songs list.  Would you like to continue?');
+        const confirmed = window.confirm('You are about to override your backed-up songs with your current Spotify songs list.  Would you like to continue?');
         if (confirmed) {
             this.storeSongs();
         }
@@ -79,8 +90,7 @@ class Dashboard extends Component {
     }
 
     getDeletedSongs() {
-        const URL = window.location.href;
-        const token = URL.match(/#(?:access_token)=([\S\s]*?)&/)[1];
+        const token = this.getToken();
         const self = this;
 
         fetch('deletedSongs', {
@@ -134,76 +144,41 @@ class Dashboard extends Component {
     }
 
     render() {
-        const URL = window.location.href;
-        const token = URL.match(/#(?:access_token)=([\S\s]*?)&/);
-
-        if (!token) {
-            this.props.history.push('/');
-            return null;
+        if (this.state.loading) {
+            return <Spinner />;
         } else {
-            if (this.state.loading) {
-                return (
-                    <div className="container">
-                        <Spinner />
-                        <div className="please-wait animated bounceInUp">Please wait...</div>
-                    </div>
-                );
+            if (this.state.new_user) {
+                return <NewUser username={this.state.user.display_name} storeSongs={this.storeSongs} />;
+            } else if (this.state.new_user_saved) {
+                return <SavedUser />;
             } else {
-                if (this.state.new_user) {
-                    return (
-                        <div className="container new-center">
-                            <div className="hello animated fadeInDown">Hello {this.state.user.display_name}!</div>
-                            <div className="no-back-up animated bounceInLeft">It looks like we don't yet have your songs backed up.</div>
-                            <div className="get-started animated bounceInLeft">Click the button below to get started!</div>
-                            <button onClick={() => this.storeSongs()} className="backup-button animated bounceInRight">Store My Music</button>
-                        </div>
-                    );
-                } else if (this.state.new_user_saved) {
-                    return (
-                        <div className="container new-center">
-                            <div className="thank-you animated bounceInLeft">
-                                Thank you for backing your songs up with Lockify!
-                            <br /><br />
-                                Click the button below to access the dashboard.
-                            </div>
-                            <br />
-                            <button onClick={() => window.location.reload()} className="backup-button small-delay animated bounceInRight">Dashboard</button>
-                        </div>
-                    );
-                } else {
-                    return (
-                        <div className="container">
-                            <div className="header">
-                                <button onClick={() => this.updateSongs()} className="backup-button header-left animate bounceInDown">Backup</button>
-                                <img onClick={() => this.sync()} src={Sync} className="sync animate bounceInDown" alt="Sync" />
-                                <button onClick={() => this.deleteAccount()} className="delete-button header-right animate bounceInDown">Delete</button>
-                            </div>
-
-                            <div className="deleted-container">
-                                <div className={this.isMobile() ? 'dashboard-title animate fadeIn' : 'dashboard-title animate slideInLeft'}>Deleted since &mdash; <div className="primary">{this.parseDate(this.state.user.updated)}</div></div>
-                                {
-                                    this.state.deleted_songs.length === 0 ? <div className={this.isMobile() ? 'no-songs-removed animated fadeIn' : 'no-songs-removed animated slideInRight'}>No songs have been removed since your last backup.</div> : this.state.deleted_songs.map((song, index) => {
-                                        return (
-                                            <div key={index} className={this.isMobile() ? 'card-container animate fadeIn' : 'card-container animate bounceInUp'}>
-                                                <div className="card" onClick={() => window.open(song.URL, '_blank')}>
-                                                    <div className="card-image">
-                                                        <img src={song.Images[0].url} alt="Album" />
-                                                    </div>
-                                                    <div className="card-song-title">
-                                                        {song.Name}
-                                                    </div>
-                                                    <div className="card-song-artist">
-                                                        {song.Artists[0].name}
-                                                    </div>
+                return (
+                    <div>
+                        <Header updateSongs={this.updateSongs} sync={this.sync} deleteAccount={this.deleteAccount} />
+                        <div className="deleted-container">
+                            <div className={this.isMobile() ? 'dashboard-title animate fadeIn' : 'dashboard-title animate slideInLeft'}>Deleted since &mdash; <div className="primary">{this.parseDate(this.state.user.updated)}</div></div>
+                            {
+                                this.state.deleted_songs.length === 0 ? <div className={this.isMobile() ? 'no-songs-removed animated fadeIn' : 'no-songs-removed animated slideInRight'}>No songs have been removed since your last backup.</div> : this.state.deleted_songs.map((song, index) => {
+                                    return (
+                                        <div key={index} className={this.isMobile() ? 'card-container animate fadeIn' : 'card-container animate bounceInUp'}>
+                                            <div className="card" onClick={() => window.open(song.URL, '_blank')}>
+                                                <div className="card-image">
+                                                    <img src={song.Image.url} alt="Album" />
+                                                </div>
+                                                <div className="card-song-title">
+                                                    {song.Name}
+                                                </div>
+                                                <div className="card-song-artist">
+                                                    {song.Artist.name}
                                                 </div>
                                             </div>
-                                        )
-                                    })
-                                }
-                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
                         </div>
-                    );
-                }
+                    </div>
+                );
             }
         }
     }

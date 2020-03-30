@@ -1,0 +1,37 @@
+.header {
+    position: relative;
+    top: 0;
+    height: 65px;
+}
+
+.sync {
+    cursor: pointer;
+    animation-duration: 1s;
+    animation-iteration-count: 1;
+    animation-delay: 1.35s;
+}
+
+.sync:hover {
+    opacity: 0.75;
+}
+
+.dash-backup-button {
+    background: black;
+    padding: 15px 25px 15px;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid black;
+    transition: background 200ms, color 200ms, border 200ms;
+    font-size: 1.25rem;
+    letter-spacing: 1.5px;
+    outline: none;
+    box-shadow: 0 3px 15px -7px black;
+    font-weight: 200;
+}
+
+.dash-backup-button:hover {
+    background: black;
+    color: white;
+    border: 1px solid transparent;
+}
