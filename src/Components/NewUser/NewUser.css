@@ -28,9 +28,16 @@
 }
 
 @media screen and (max-width: 767px) {
+    .new-user-hello {
+        line-height: 1;
+        padding: 0px 15px;
+        font-size: 4rem;
+    }
     .no-back-up, .get-started {
-        font-size: 1.15rem;
+        font-size: 1.75rem;
         margin-bottom: 30px;
+        padding: 0px 15px;
+        line-height: 1;
     }
     .hello {
         font-size: 2.75rem;

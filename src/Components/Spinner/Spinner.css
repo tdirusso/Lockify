@@ -5,3 +5,10 @@
 .spinner {
     margin: 0 auto;
 }
+
+@media screen and (max-width: 767px) {
+    .spinner {
+        height: 150px !important;
+        width: 150px !important;
+    }
+}

@@ -1,24 +1,27 @@
 .header {
     position: relative;
     top: 0;
-    height: 65px;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.header * {
+    animation-duration: 750ms;
 }
 
 .sync {
     cursor: pointer;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
-    animation-delay: 1.35s;
+    vertical-align: bottom;
+    transition: transform 100ms;
 }
 
 .sync:hover {
-    opacity: 0.75;
+    transform: scale(1.15) !important;
 }
 
 .dash-backup-button {
-    background: black;
     padding: 15px 25px 15px;
-    color: white;
     border-radius: 8px;
     cursor: pointer;
     border: 1px solid black;
@@ -28,10 +31,42 @@
     outline: none;
     box-shadow: 0 3px 15px -7px black;
     font-weight: 200;
+    margin: 0 20px;
 }
 
 .dash-backup-button:hover {
     background: black;
     color: white;
     border: 1px solid transparent;
+}
+
+.delete-button {
+    padding: 15px 25px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid white;
+    transition: background 200ms, color 200ms, border 200ms;
+    font-size: 1.25rem;
+    letter-spacing: 1.5px;
+    outline: none;
+    box-shadow: 0 3px 15px -7px black;
+    font-weight: 200;
+    margin: 0 20px;
+    float: right;
+    color: white;
+    background: transparent;
+}
+
+@media screen and (max-width: 767px) {
+    .dash-backup-button, .delete-button {
+        font-size: 18px;
+        padding: 7px 15px 7px;
+        margin: 0 10px;
+    }
+    .dash-backup-button {
+        float: left;
+    }
+    .sync {
+        width: 40px;
+    }
 }

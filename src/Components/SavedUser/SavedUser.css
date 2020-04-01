@@ -2,11 +2,6 @@
     margin-bottom: 15px;
 }
 
-.thank-you {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
 .saved-user.title {
     animation-delay: 0ms;
 }
@@ -24,7 +19,10 @@
 }
 
 @media screen and (max-width: 767px) {
-    .thank-you {
-        font-size: 1.5rem;
+    .saved-user.description {
+        margin-bottom: 30px;
+    }
+    .dashboard-button {
+        font-size: 18px;
     }
 }

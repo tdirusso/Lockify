@@ -2,18 +2,18 @@ footer {
 	position: absolute;
 	bottom: 0;
 	background-color: white;
-	height: 100px;
+	height: 60px;
 	width: 100%;
-    border-top: 1px solid black;
-    overflow: hidden;
+	border-top: 1px solid black;
+	overflow: hidden;
 }
 
 .media-list {
 	position: relative;
 	margin: 0;
-	line-height: 100px;
-    background: white;
-    text-align: center;
+	line-height: 60px;
+	background: white;
+	text-align: center;
 }
 
 .media-list li {
@@ -30,4 +30,18 @@ footer {
 .media-list a:hover {
 	text-decoration: underline;
 	color: #6561ed;
+}
+
+@media screen and (max-width: 767px) {
+	footer {
+		position: fixed;
+		height: 50px;
+	}
+	.media-list {
+		line-height: 50px;
+	}
+	.media-list li {
+		margin: 0 15px;
+		font-size: 1rem;
+	}
 }

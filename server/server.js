@@ -22,7 +22,7 @@ const auth_domain = 'accounts.spotify.com/authorize';
 const auth_response_type = 'token';
 const auth_client_id = process.env.REACT_APP_CLIENT_ID;
 const auth_scope = encodeURIComponent('user-library-read user-read-email');
-const auth_redirect_uri = 'http://localhost:3000/dashboard';
+const auth_redirect_uri = 'http://192.168.0.152:3000/dashboard';
 const authorize_url = `${auth_protocol}://${auth_domain}?response_type=${auth_response_type}&client_id=${auth_client_id}&scope=${auth_scope}&redirect_uri=${auth_redirect_uri}&state=123`;
 
 const request = (options) => {
@@ -39,9 +39,7 @@ const request = (options) => {
     })
 };
 
-
 /******************** API Endpoints ********************/
-
 
 app.get('/getUser', (req, res) => {
     const access_token = req.query.access_token;
@@ -70,45 +68,10 @@ app.get('/getUser', (req, res) => {
             } else {
                 connection.query(`SELECT * FROM Users WHERE Username = '${user.id}'`, (err, result) => {
                     if (err) throw err;
-                    if (result.length === 0) {
-                        let songs = [];
-
-                        getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
-                            user.songs = songs;
-                            res.json(user);
-                        }).catch(error => res.json(error));
-
-                        function getSongs(URL) {
-                            const nextURL = url.parse(URL);
-
-                            options = {
-                                hostname: 'api.spotify.com',
-                                path: nextURL.path,
-                                method: 'GET',
-                                headers: {
-                                    'Authorization': `Bearer ${access_token}`,
-                                }
-                            };
-
-                            return new Promise((resolve, reject) => {
-                                request(options)
-                                    .then(data => {
-                                        data = JSON.parse(data);
-
-                                        data.items.forEach(song => {
-                                            songs.push({ Name: song.track.name, Artist: song.track.artists[0], Image: song.track.album.images[0], URL: song.track.external_urls.spotify });
-                                        });
-
-                                        resolve(data.next ? getSongs(data.next) : '');
-                                    })
-                                    .catch(error => reject(error));
-                            });
-                        }
-                    } else {
-                        user.songs = JSON.parse(result[0].Songs);
+                    if (result.length) {
                         user.updated = result[0].Updated;
-                        res.json(user);
                     }
+                    res.json(user);
                 });
 
             }
@@ -119,17 +82,53 @@ app.get('/getUser', (req, res) => {
 
 app.post('/storeSongs', (req, res) => {
     const user = req.body.user;
+    const access_token = req.body.token;
 
     if (!user) {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    const song_string = JSON.stringify(JSON.stringify(user.songs));
+    if (!access_token) {
+        return res.status(400).json({ Error: "No access token was provided." });
+    }
 
-    connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES ("${user.display_name}", ${song_string}, NOW()) ON DUPLICATE KEY UPDATE Songs = ${song_string}, Updated = NOW();`, (err, result) => {
-        if (err) throw err;
-        res.end();
-    });
+    let songs = [];
+
+    getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
+        const song_string = JSON.stringify(JSON.stringify(songs));
+
+        connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES ("${user.display_name}", ${song_string}, NOW()) ON DUPLICATE KEY UPDATE Songs = ${song_string}, Updated = NOW();`, (err) => {
+            if (err) throw err;
+            res.end();
+        });
+    }).catch(error => res.json(error));
+
+    function getSongs(URL) {
+        const nextURL = url.parse(URL);
+
+        options = {
+            hostname: 'api.spotify.com',
+            path: nextURL.path,
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+            }
+        };
+
+        return new Promise((resolve, reject) => {
+            request(options)
+                .then(data => {
+                    data = JSON.parse(data);
+
+                    data.items.forEach(song => {
+                        songs.push({ Name: song.track.name, Artist: song.track.artists[0], Image: song.track.album.images[0], URL: song.track.external_urls.spotify });
+                    });
+
+                    resolve(data.next ? getSongs(data.next) : '');
+                })
+                .catch(error => reject(error));
+        });
+    }
 });
 
 
@@ -198,8 +197,8 @@ app.post('/deleteAccount', (req, res) => {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    connection.query(`DELETE FROM Users WHERE Username = '${user.display_name}'`, (err, result) => {
+    connection.query(`DELETE FROM Users WHERE Username = '${user.display_name}'`, (err) => {
         if (err) throw err;
-        res.json('Deleted');
+        res.end();
     });
 });
