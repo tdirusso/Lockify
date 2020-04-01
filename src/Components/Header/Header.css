@@ -24,7 +24,7 @@
     padding: 15px 25px 15px;
     border-radius: 8px;
     cursor: pointer;
-    border: 1px solid black;
+    border: 1px solid white;
     transition: background 200ms, color 200ms, border 200ms;
     font-size: 1.25rem;
     letter-spacing: 1.5px;

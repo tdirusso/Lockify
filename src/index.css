@@ -28,9 +28,9 @@ html, body {
 }
 
 .main-button {
-    background: white;
+    background: transparent;
     padding: 20px 40px 20px;
-    color: black;
+    color: white;
     border-radius: 20px;
     cursor: pointer;
     border: 1px solid;
