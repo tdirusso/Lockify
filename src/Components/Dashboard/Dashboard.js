@@ -103,17 +103,7 @@ class Dashboard extends Component {
             }
         }).then(data => data.ok ? data.json() : Error(data.statusText))
             .then((response) => {
-                let deleted_songs = JSON.parse(response);
-                deleted_songs[0].Artist.name = 'df fd df f d fdf d d f sdf ds fdfd d fd f d ';
-                deleted_songs[0].Name = 'sdf df ds df df df df df d sdf sd sd dd f';
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
-                deleted_songs.push(deleted_songs[0]);
+                const deleted_songs = JSON.parse(response);
 
                 self.setState({
                     loading: false,
