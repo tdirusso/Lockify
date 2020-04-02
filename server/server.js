@@ -6,7 +6,7 @@ const path = require('path');
 const url = require('url');
 const app = express();
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 80;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -21,9 +21,9 @@ app.listen(port);
 const auth_protocol = 'https';
 const auth_domain = 'accounts.spotify.com/authorize';
 const auth_response_type = 'token';
-const auth_client_id = process.env.REACT_APP_CLIENT_ID;
+const auth_client_id = process.env.CLIENT_ID;
 const auth_scope = encodeURIComponent('user-library-read user-read-email');
-const auth_redirect_uri = 'http://192.168.0.152:3000/dashboard';
+const auth_redirect_uri = 'https://lockify.herokuapp.com/dashboard';
 const authorize_url = `${auth_protocol}://${auth_domain}?response_type=${auth_response_type}&client_id=${auth_client_id}&scope=${auth_scope}&redirect_uri=${auth_redirect_uri}&state=123`;
 
 const request = (options) => {
@@ -198,4 +198,8 @@ app.post('/deleteAccount', (req, res) => {
         if (err) throw err;
         res.end();
     });
+});
+
+app.get('*', (_, res) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'))
 });
