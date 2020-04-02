@@ -6,7 +6,7 @@ const domain = 'accounts.spotify.com/authorize';
 const response_type = 'token';
 const client_id = process.env.REACT_APP_CLIENT_ID;
 const scope = encodeURIComponent('user-library-read user-read-email');
-const redirect_uri = 'https://lockify.herokuapp.com/dashboard';
+const redirect_uri = process.env.REACT_APP_REDIRECT_URI;
 
 const authorize_url = `${protocol}://${domain}?response_type=${response_type}&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=123`;
 

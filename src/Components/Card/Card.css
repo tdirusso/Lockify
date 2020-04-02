@@ -23,11 +23,15 @@
 }
 
 .card-song-title {
+    text-overflow: ellipsis;
     margin: 20px auto;
     font-size: 1.5rem;
     text-align: center;
     line-height: 1;
     font-weight: 200;
+    padding: 0 10px;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .card-song-artist {
@@ -36,6 +40,10 @@
     text-align: center;
     font-style: italic;
     font-weight: 200;
+    padding: 0 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .card:hover {
@@ -48,9 +56,13 @@
         transform: none;
     }
     .card {
-        overflow-y: scroll;
         margin: 10px;
-        height: 350px;
+        height: 300px;
+        width: 200px;
+    }
+    .card-image {
+        height: 200px;
+        width: 200px;
     }
     .card-song-artist, .card-song-title {
         font-size: 25px;

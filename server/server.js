@@ -1,3 +1,4 @@
+const rateLimit = require("express-rate-limit");
 const bodyParser = require('body-parser');
 const connection = require('./database');
 const express = require('express');
@@ -13,6 +14,13 @@ app.use(bodyParser.json({ limit: '50mb' }));
 
 require('dotenv').config();
 
+const api_limiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 300
+});
+
+app.use("/api/", api_limiter);
+
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.json());
 
@@ -23,7 +31,7 @@ const auth_domain = 'accounts.spotify.com/authorize';
 const auth_response_type = 'token';
 const auth_client_id = process.env.CLIENT_ID;
 const auth_scope = encodeURIComponent('user-library-read user-read-email');
-const auth_redirect_uri = 'https://lockify.herokuapp.com/dashboard';
+const auth_redirect_uri = process.env.REDIRECT_URI;
 const authorize_url = `${auth_protocol}://${auth_domain}?response_type=${auth_response_type}&client_id=${auth_client_id}&scope=${auth_scope}&redirect_uri=${auth_redirect_uri}&state=123`;
 
 const request = (options) => {
@@ -37,12 +45,12 @@ const request = (options) => {
         req.on('error', error => reject(error));
         if (options.method === 'POST') req.write(options.payload);
         req.end();
-    })
+    });
 };
 
 /******************** API Endpoints ********************/
 
-app.get('/getUser', (req, res) => {
+app.get('/api/getUser', (req, res) => {
     const access_token = req.query.access_token;
 
     if (!access_token) {
@@ -68,7 +76,10 @@ app.get('/getUser', (req, res) => {
                 });
             } else {
                 connection.query(`SELECT * FROM Users WHERE Username = ?`, [user.id], (err, result) => {
-                    if (err) throw err;
+                    if (err) {
+                        console.log(`SERVER ERROR FROM QUERY - ${err}`);
+                        throw err;
+                    }
                     if (result.length) {
                         user.updated = result[0].Updated;
                     }
@@ -77,10 +88,13 @@ app.get('/getUser', (req, res) => {
 
             }
         })
-        .catch(error => res.json(error));
+        .catch(error => {
+            console.log(`SEVER ERROR - /getUser - ${error}`);
+            res.json(error)
+        });
 });
 
-app.post('/storeSongs', (req, res) => {
+app.post('/api/storeSongs', (req, res) => {
     const user = req.body.user;
     const access_token = req.body.token;
 
@@ -98,10 +112,16 @@ app.post('/storeSongs', (req, res) => {
         const song_string = JSON.stringify(songs);
 
         connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES (?,?, NOW()) ON DUPLICATE KEY UPDATE Songs = ?, Updated = NOW();`, [user.display_name, song_string, song_string], (err) => {
-            if (err) throw err;
+            if (err) {
+                console.log(`SERVER ERROR FROM QUERY - ${err}`);
+                throw err;
+            }
             res.end();
         });
-    }).catch(error => res.json(error));
+    }).catch(error => {
+        console.log(`SERVER ERROR - /storeSongs (getSongs METHOD) - ${error}`);
+        res.json(error);
+    });
 
     function getSongs(URL) {
         const nextURL = url.parse(URL);
@@ -131,7 +151,7 @@ app.post('/storeSongs', (req, res) => {
     }
 });
 
-app.post('/deletedSongs', (req, res) => {
+app.post('/api/deletedSongs', (req, res) => {
     const access_token = req.body.access_token;
 
     if (!access_token) {
@@ -145,7 +165,24 @@ app.post('/deletedSongs', (req, res) => {
     }
 
     connection.query(`SELECT * FROM Users WHERE Username = ?`, [user.display_name], (err, result) => {
-        if (err) throw err;
+        if (err) {
+            console.log(`SERVER ERROR FROM QUERY - ${err}`);
+            throw err;
+        }
+
+        let songs = [];
+        getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
+            let stored_songs = JSON.parse(result[0].Songs);
+
+            deleted_songs = stored_songs.filter(function (song) {
+                return !songs.includes(song.Name);
+            });
+
+            res.json(JSON.stringify(deleted_songs));
+        }).catch(error => {
+            console.log(`SERVER ERROR - /deletedSongs (getSongs METHOD) - ${error}`)
+            res.json(error);
+        });
 
         function getSongs(URL) {
             const nextURL = url.parse(URL);
@@ -173,29 +210,21 @@ app.post('/deletedSongs', (req, res) => {
                     .catch(error => reject(error));
             });
         }
-
-        let songs = [];
-        getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
-            let stored_songs = JSON.parse(result[0].Songs);
-
-            deleted_songs = stored_songs.filter(function (song) {
-                return !songs.includes(song.Name);
-            });
-
-            res.json(JSON.stringify(deleted_songs));
-        }).catch(error => res.json(error));
     });
 });
 
-app.post('/deleteAccount', (req, res) => {
+app.post('/api/deleteAccount', (req, res) => {
     const user = req.body.user;
 
     if (!user) {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    connection.query(`DELETE FROM Users WHERE Username = ?`, [user.display_name], (err) => {
-        if (err) throw err;
+    connection.query(`DELETE FROM Users WHERE Username = ?`, [user.display_name], (error) => {
+        if (error) {
+            console.log(`SERVER ERROR FROM QUERY - ${error}`);
+            throw error;
+        }
         res.end();
     });
 });

@@ -34,7 +34,7 @@ class Dashboard extends Component {
         const token = this.getToken();
         const self = this;
 
-        fetch(`getUser?access_token=${token}`)
+        fetch(`api/getUser?access_token=${token}`)
             .then(data => data.ok ? data.json() : Error(data.statusText))
             .then(response => {
                 if (response.redirect === true) {
@@ -62,7 +62,7 @@ class Dashboard extends Component {
         this.setState({ loading: true });
         const self = this;
 
-        fetch('storeSongs', {
+        fetch('api/storeSongs', {
             method: 'POST',
             body: JSON.stringify({
                 user: self.state.user,
@@ -92,7 +92,7 @@ class Dashboard extends Component {
         const token = this.getToken();
         const self = this;
 
-        fetch('deletedSongs', {
+        fetch('api/deletedSongs', {
             method: 'POST',
             body: JSON.stringify({
                 user: self.state.user,
@@ -103,7 +103,17 @@ class Dashboard extends Component {
             }
         }).then(data => data.ok ? data.json() : Error(data.statusText))
             .then((response) => {
-                const deleted_songs = JSON.parse(response);
+                let deleted_songs = JSON.parse(response);
+                deleted_songs[0].Artist.name = 'df fd df f d fdf d d f sdf ds fdfd d fd f d ';
+                deleted_songs[0].Name = 'sdf df ds df df df df df d sdf sd sd dd f';
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
+                deleted_songs.push(deleted_songs[0]);
 
                 self.setState({
                     loading: false,
@@ -122,7 +132,7 @@ class Dashboard extends Component {
         const confirmed = window.confirm('Are you sure you want to delete your Lockify account?\n\nAll of your data will be deleted.');
 
         if (confirmed) {
-            fetch('deleteAccount', {
+            fetch('api/deleteAccount', {
                 method: 'POST',
                 body: JSON.stringify({ user: self.state.user }),
                 headers: {

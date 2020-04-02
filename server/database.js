@@ -1,4 +1,4 @@
-var mysql = require('mysql');
+const mysql = require('mysql');
 
 require('dotenv').config();
 
@@ -9,14 +9,12 @@ const db_config = {
     database: process.env.DB_NAME
 };
 
-console.log(db_config);
-
-var connection;
+let connection;
 
 connection = mysql.createPool(db_config);
 
 connection.on('error', (error) => {
-    console.log(error);
+    console.log(`Database Error - ${error}`);
     connection = mysql.createPool(db_config);
 });
 

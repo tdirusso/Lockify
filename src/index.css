@@ -8,6 +8,10 @@ html, body {
 	overflow-x: hidden
 }
 
+* {
+	-webkit-overflow-scrolling: touch;
+}
+
 .container {
 	text-align: center;
 	margin-top: 20vh;
@@ -28,25 +32,25 @@ html, body {
 }
 
 .main-button {
-    background: transparent;
-    padding: 20px 40px 20px;
-    color: white;
-    border-radius: 20px;
-    cursor: pointer;
-    border: 1px solid;
-    transition: background 200ms, color 200ms, border 200ms;
-    font-size: 2rem;
-    letter-spacing: 1.5px;
-    outline: none;
-    box-shadow: 0 3px 15px -7px black;
-    margin: 25px;
-    font-weight: 200;
+	background: transparent;
+	padding: 20px 40px 20px;
+	color: white;
+	border-radius: 20px;
+	cursor: pointer;
+	border: 1px solid;
+	transition: background 200ms, color 200ms, border 200ms;
+	font-size: 2rem;
+	letter-spacing: 1.5px;
+	outline: none;
+	box-shadow: 0 3px 15px -7px black;
+	margin: 25px;
+	font-weight: 200;
 }
 
 .main-button:hover {
-    background: black;
-    color: white;
-    border: 1px solid transparent;
+	background: black;
+	color: white;
+	border: 1px solid transparent;
 }
 
 @media screen and (max-width: 767px) {

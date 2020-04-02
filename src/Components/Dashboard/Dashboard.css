@@ -63,7 +63,4 @@ ul li {
         font-size: 2rem;
         border-bottom: none;
     }
-    * {
-        -webkit-overflow-scrolling: touch;
-    }
 }
