@@ -5,7 +5,8 @@ const https = require('https');
 const path = require('path');
 const url = require('url');
 const app = express();
-const port = 8000;
+
+const port = process.env.PORT || 8000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -66,7 +67,7 @@ app.get('/getUser', (req, res) => {
                     URL: authorize_url
                 });
             } else {
-                connection.query(`SELECT * FROM Users WHERE Username = '${user.id}'`, (err, result) => {
+                connection.query(`SELECT * FROM Users WHERE Username = ?`, [user.id], (err, result) => {
                     if (err) throw err;
                     if (result.length) {
                         user.updated = result[0].Updated;
@@ -78,7 +79,6 @@ app.get('/getUser', (req, res) => {
         })
         .catch(error => res.json(error));
 });
-
 
 app.post('/storeSongs', (req, res) => {
     const user = req.body.user;
@@ -95,9 +95,9 @@ app.post('/storeSongs', (req, res) => {
     let songs = [];
 
     getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
-        const song_string = JSON.stringify(JSON.stringify(songs));
+        const song_string = JSON.stringify(songs);
 
-        connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES ("${user.display_name}", ${song_string}, NOW()) ON DUPLICATE KEY UPDATE Songs = ${song_string}, Updated = NOW();`, (err) => {
+        connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES (?,?, NOW()) ON DUPLICATE KEY UPDATE Songs = ?, Updated = NOW();`, [user.display_name, song_string, song_string], (err) => {
             if (err) throw err;
             res.end();
         });
@@ -131,9 +131,7 @@ app.post('/storeSongs', (req, res) => {
     }
 });
 
-
 app.post('/deletedSongs', (req, res) => {
-
     const access_token = req.body.access_token;
 
     if (!access_token) {
@@ -146,7 +144,7 @@ app.post('/deletedSongs', (req, res) => {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    connection.query(`SELECT * FROM Users WHERE Username = '${user.display_name}'`, (err, result) => {
+    connection.query(`SELECT * FROM Users WHERE Username = ?`, [user.display_name], (err, result) => {
         if (err) throw err;
 
         function getSongs(URL) {
@@ -189,7 +187,6 @@ app.post('/deletedSongs', (req, res) => {
     });
 });
 
-
 app.post('/deleteAccount', (req, res) => {
     const user = req.body.user;
 
@@ -197,7 +194,7 @@ app.post('/deleteAccount', (req, res) => {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    connection.query(`DELETE FROM Users WHERE Username = '${user.display_name}'`, (err) => {
+    connection.query(`DELETE FROM Users WHERE Username = ?`, [user.display_name], (err) => {
         if (err) throw err;
         res.end();
     });
