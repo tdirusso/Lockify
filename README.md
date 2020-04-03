@@ -1,4 +1,4 @@
-#Lockify
+# Lockify
 Have you accidentally deleted or unliked a song from your Spotify playlist, only to find out there is no real way to determine exactly which song your quick and mindless fingers inadvertently swiped off the list?
 
 Your problem has now been solved!
@@ -7,21 +7,21 @@ Your problem has now been solved!
 
 ![](https://i.ibb.co/71mWcbx/lockify-dashboard.png)
 
-##The Stack
+## The Stack
 - NodeJS & Express -- *Server*
 - React -- *UI / UX*
 - MySQL -- *Database*
 
-##Deployment
+## Deployment
 - Heroku -- the Lockify web application is hosted on a free tier Heroku Dyno.  The NodeJS server currently hosts the static files that were compiled and built by React.
 
-##Links
+## Links
 - **[Lockify Dashboard](https://lockify.heroku.com)**
 
 
 
 
-##Features
+## Features
 - Directly and securely login with your existing Spotify account.
 - Back-up your current Spotify playlist for future access to recently deleted songs.
 - Seamlessly navigate from Lockify to Spotify (web or mobile) to listen to and re-add songs.
