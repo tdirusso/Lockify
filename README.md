@@ -16,7 +16,7 @@ Your problem has now been solved!
 - Heroku &mdash; the Lockify web application is hosted on a free tier Heroku Dyno.  The NodeJS server currently hosts the static files that were compiled and built by React.
 
 ## Links
-- **[Lockify Dashboard](https://lockify.heroku.com)**
+- **[Lockify Dashboard](https://lockify.herokuapp.com)**
 
 ## Features
 - Directly and securely login with your existing Spotify account.
