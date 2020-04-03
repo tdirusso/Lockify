@@ -9,17 +9,14 @@ Your problem has now been solved!
 
 ## The Stack
 - NodeJS & Express &mdash; *Server*
-- React -- *UI / UX*
-- MySQL -- *Database*
+- React &mdash; *UI / UX*
+- MySQL &mdash; *Database*
 
 ## Deployment
-- Heroku -- the Lockify web application is hosted on a free tier Heroku Dyno.  The NodeJS server currently hosts the static files that were compiled and built by React.
+- Heroku &mdash; the Lockify web application is hosted on a free tier Heroku Dyno.  The NodeJS server currently hosts the static files that were compiled and built by React.
 
 ## Links
 - **[Lockify Dashboard](https://lockify.heroku.com)**
-
-
-
 
 ## Features
 - Directly and securely login with your existing Spotify account.
@@ -27,5 +24,5 @@ Your problem has now been solved!
 - Seamlessly navigate from Lockify to Spotify (web or mobile) to listen to and re-add songs.
 - Easily bring your Spotify playlist back up to date in our database 
 - Quickly refresh the dashboard for real time updates.
-- No sweat -- you can effortlessly delete your Lockify account straight from the dashboard.
+- No sweat &mdash; you can effortlessly delete your Lockify account straight from the dashboard.
 
