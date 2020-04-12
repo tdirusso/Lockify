@@ -111,7 +111,7 @@ app.post('/api/storeSongs', (req, res) => {
     getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
         const song_string = JSON.stringify(songs);
 
-        connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES (?,?, NOW()) ON DUPLICATE KEY UPDATE Songs = ?, Updated = NOW();`, [user.display_name, song_string, song_string], (err) => {
+        connection.query(`INSERT INTO Users (Username, Songs, Updated) VALUES (?,?, NOW()) ON DUPLICATE KEY UPDATE Songs = ?, Updated = NOW();`, [user.id, song_string, song_string], (err) => {
             if (err) {
                 console.log(`SERVER ERROR FROM QUERY - ${err}`);
                 throw err;
@@ -164,7 +164,7 @@ app.post('/api/deletedSongs', (req, res) => {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    connection.query(`SELECT * FROM Users WHERE Username = ?`, [user.display_name], (err, result) => {
+    connection.query(`SELECT * FROM Users WHERE Username = ?`, [user.id], (err, result) => {
         if (err) {
             console.log(`SERVER ERROR FROM QUERY - ${err}`);
             throw err;
@@ -174,9 +174,7 @@ app.post('/api/deletedSongs', (req, res) => {
         getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
             let stored_songs = JSON.parse(result[0].Songs);
 
-            deleted_songs = stored_songs.filter(function (song) {
-                return !songs.includes(song.Name);
-            });
+            deleted_songs = stored_songs.filter(song => !songs.includes(song.Name));
 
             res.json(JSON.stringify(deleted_songs));
         }).catch(error => {
@@ -220,7 +218,7 @@ app.post('/api/deleteAccount', (req, res) => {
         return res.status(400).json({ Error: "No user account was provided." });
     }
 
-    connection.query(`DELETE FROM Users WHERE Username = ?`, [user.display_name], (error) => {
+    connection.query(`DELETE FROM Users WHERE Username = ?`, [user.id], (error) => {
         if (error) {
             console.log(`SERVER ERROR FROM QUERY - ${error}`);
             throw error;
