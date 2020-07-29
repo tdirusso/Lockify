@@ -5,6 +5,7 @@ import NewUser from '../NewUser/NewUser';
 import Header from '../Header/Header';
 import Card from '../Card/Card';
 import './Dashboard.css';
+import { authorize_url } from '../Login/Login';
 
 class Dashboard extends Component {
 
@@ -31,47 +32,50 @@ class Dashboard extends Component {
     }
 
     getUser() {
-        const token = this.getToken();
         const self = this;
 
-        fetch(`api/getUser?access_token=${token}`)
-            .then(data => data.ok ? data.json() : Error(data.statusText))
+        const options = {
+            headers: {
+                'Authorization': `Bearer ${this.getToken()}`
+            }
+        };
+
+        fetch(`https://api.spotify.com/v1/me`, options)
+            .then(data => {
+                if (data.status === 401) {
+                    window.location.href = authorize_url;
+                }
+
+                return data.ok ? data.json() : Error(data.statusText)
+            })
             .then(response => {
-                if (response.redirect === true) {
-                    window.location = response.URL;
+                const existingUser = localStorage.getItem(`lockify-${response.id}`);
+
+                if (!existingUser) {
+                    self.setState({
+                        user: response.id,
+                        new_user: true,
+                        loading: false
+                    });
                 } else {
-                    if (response.updated === undefined) {
-                        self.setState({
-                            user: response,
-                            new_user: true,
-                            loading: false
-                        });
-                    } else {
-                        self.setState({
-                            user: response,
-                            new_user: false,
-                        });
-                        self.getDeletedSongs();
-                    }
+                    self.setState({
+                        user: response.id,
+                        new_user: false,
+                    });
+                    self.getDeletedSongs();
                 }
             }).catch(error => console.log(error));
     }
 
-
     storeSongs() {
         this.setState({ loading: true });
         const self = this;
+        let songs = [];
 
-        fetch('api/storeSongs', {
-            method: 'POST',
-            body: JSON.stringify({
-                user: self.state.user,
-                token: this.getToken()
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(() => {
+        getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
+            const song_string = JSON.stringify(songs);
+            localStorage.setItem(`lockify-${self.state.user}`, song_string);
+
             self.setState({
                 loading: false,
                 new_user: false,
@@ -79,6 +83,32 @@ class Dashboard extends Component {
             });
         }).catch(error => console.log(error));
 
+        function getSongs(URL) {
+            const options = {
+                headers: {
+                    'Authorization': `Bearer ${self.getToken()}`
+                }
+            };
+
+            return new Promise((resolve, reject) => {
+                fetch(URL, options)
+                    .then(data => {
+                        if (data.status === 401) {
+                            window.location.href = authorize_url;
+                        }
+
+                        return data.ok ? data.json() : Error(data.statusText);
+                    })
+                    .then((response) => {
+                        response.items.forEach(song => {
+                            songs.push({ Name: song.track.name, Artist: song.track.artists[0], Image: song.track.album.images[0], URL: song.track.external_urls.spotify });
+                        });
+
+                        resolve(response.next ? getSongs(response.next) : '');
+                    })
+                    .catch(error => reject(error));
+            });
+        }
     }
 
     updateSongs() {
@@ -89,27 +119,49 @@ class Dashboard extends Component {
     }
 
     getDeletedSongs() {
-        const token = this.getToken();
         const self = this;
 
-        fetch('api/deletedSongs', {
-            method: 'POST',
-            body: JSON.stringify({
-                user: self.state.user,
-                access_token: token
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(data => data.ok ? data.json() : Error(data.statusText))
-            .then((response) => {
-                const deleted_songs = JSON.parse(response);
+        let storedSongs = localStorage.getItem(`lockify-${self.state.user}`);
 
+        if (storedSongs) {
+            storedSongs = JSON.parse(storedSongs);
+
+            let songs = [];
+            getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
+                let deletedSongs = storedSongs.filter(song => !songs.includes(song.Name));
                 self.setState({
                     loading: false,
-                    deleted_songs: deleted_songs
+                    deleted_songs: deletedSongs
                 });
             }).catch(error => console.log(error));
+
+            function getSongs(URL) {
+                const options = {
+                    headers: {
+                        'Authorization': `Bearer ${self.getToken()}`
+                    }
+                };
+
+                return new Promise((resolve, reject) => {
+                    fetch(URL, options)
+                        .then(data => {
+                            if (data.status === 401) {
+                                window.location.href = authorize_url;
+                            }
+
+                            return data.ok ? data.json() : Error(data.statusText);
+                        })
+                        .then((response) => {
+                            response.items.forEach(song => {
+                                songs.push(song.track.name);
+                            });
+
+                            resolve(response.next ? getSongs(response.next) : '');
+                        })
+                        .catch(error => reject(error));
+                });
+            }
+        }
     }
 
     sync() {
@@ -118,19 +170,11 @@ class Dashboard extends Component {
     }
 
     deleteAccount() {
-        const self = this;
         const confirmed = window.confirm('Are you sure you want to delete your Lockify account?\n\nAll of your data will be deleted.');
 
         if (confirmed) {
-            fetch('api/deleteAccount', {
-                method: 'POST',
-                body: JSON.stringify({ user: self.state.user }),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(() => {
-                window.location = window.location.origin;
-            }).catch(error => console.log(error));
+            localStorage.removeItem(`lockify-${this.state.user}`);
+            window.location.href = window.location.origin;
         }
     }
 
@@ -147,7 +191,7 @@ class Dashboard extends Component {
             return <Spinner />;
         } else {
             if (this.state.new_user) {
-                return <NewUser username={this.state.user.display_name} storeSongs={this.storeSongs} />;
+                return <NewUser username={this.state.user} storeSongs={this.storeSongs} />;
             } else if (this.state.new_user_saved) {
                 return <SavedUser />;
             } else {

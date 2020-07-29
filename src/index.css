@@ -3,9 +3,12 @@ html, body {
 	padding: 0;
 	height: 100vh;
 	background-image: linear-gradient(45deg, #6561ed, #26c3de);
-	font-family: 'Source Sans Pro', serif;
 	color: white;
 	overflow-x: hidden
+}
+
+body * {
+	font-family: 'Source Sans Pro', serif;
 }
 
 * {

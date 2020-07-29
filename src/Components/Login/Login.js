@@ -8,7 +8,7 @@ const client_id = process.env.REACT_APP_CLIENT_ID;
 const scope = encodeURIComponent('user-library-read user-read-email');
 const redirect_uri = process.env.REACT_APP_REDIRECT_URI;
 
-const authorize_url = `${protocol}://${domain}?response_type=${response_type}&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=123`;
+export const authorize_url = `${protocol}://${domain}?response_type=${response_type}&client_id=${client_id}&scope=${scope}&redirect_uri=${redirect_uri}&state=123`;
 
 class Login extends Component {
 
