@@ -10,7 +10,6 @@ Your problem has now been solved!
 ## The Stack
 - NodeJS & Express &mdash; *Server*
 - React &mdash; *UI / UX*
-- MySQL &mdash; *Database*
 
 ## Deployment
 - Heroku &mdash; the Lockify web application is hosted on a free tier Heroku Dyno.  The NodeJS server currently hosts the static files that were compiled and built by React.
