@@ -60,6 +60,7 @@ class Dashboard extends Component {
                 } else {
                     self.setState({
                         user: response.id,
+                        updated: localStorage.getItem(`lockify-updated-${response.id}`),
                         new_user: false,
                     });
                     self.getDeletedSongs();
@@ -75,11 +76,13 @@ class Dashboard extends Component {
         getSongs('https://api.spotify.com/v1/me/tracks?limit=50').then(() => {
             const song_string = JSON.stringify(songs);
             localStorage.setItem(`lockify-${self.state.user}`, song_string);
+            localStorage.setItem(`lockify-updated-${self.state.user}`, new Date().toLocaleDateString());
 
             self.setState({
                 loading: false,
                 new_user: false,
-                new_user_saved: true
+                new_user_saved: true,
+                updated: new Date().toLocaleDateString()
             });
         }).catch(error => console.log(error));
 
@@ -174,6 +177,7 @@ class Dashboard extends Component {
 
         if (confirmed) {
             localStorage.removeItem(`lockify-${this.state.user}`);
+            localStorage.removeItem(`lockify-updated-${this.state.user}`);
             window.location.href = window.location.origin;
         }
     }
@@ -199,7 +203,7 @@ class Dashboard extends Component {
                     <div>
                         <Header updateSongs={this.updateSongs} sync={this.sync} deleteAccount={this.deleteAccount} />
                         <div className="deleted-container">
-                            <div className="title animated fadeInDown">Songs you've deleted since {new Date(this.state.user.updated).toLocaleDateString()}</div>
+                            <div className="title animated fadeInDown">Songs you've deleted since {this.state.updated}</div>
                             <br />
                             <div className="animated fadeInUp cards-container">
                                 {this.renderCards()}

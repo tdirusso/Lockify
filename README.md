@@ -3,7 +3,7 @@ Have you accidentally deleted or unliked a song from your Spotify playlist, only
 
 Your problem has now been solved!
 
-**[Lockify](http://lockify.herokuapp.com/)** gives you the ability to back-up your Spotify playlist for future access to recently deleted songs through a free and open-source dashboard.
+**[Lockify](https://lockify.herokuapp.com/)** gives you the ability to back-up your Spotify playlist for future access to recently deleted songs through a free and open-source dashboard.
 
 ![](https://i.ibb.co/71mWcbx/lockify-dashboard.png)
 
